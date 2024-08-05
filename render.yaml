@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: my-python-service
-    env: python
-    runtime: python3.8  # Specify the Python version here
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "python your_script.py"
-    plan: free
-    region: oregon
