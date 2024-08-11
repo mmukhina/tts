@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Speech</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #loading {
+            margin-top: 20px;
+            color: blue;
+        }
+        #audio-player {
+            margin-top: 20px;
+        }
+        #download-link {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Text to Speech</h1>
+    <textarea id="text-input" rows="4" cols="50" placeholder="Enter text here..."></textarea>
+    <br>
+    <button id="generate-button">Generate Audio</button>
+    <div id="loading" style="display: none;">Generating audio, please wait...</div>
+    <div id="download-link" style="display: none;">
+        <a id="audio-download" href="" download>Download Audio</a>
+    </div>
+
+    <script>
+        document.getElementById('generate-button').addEventListener('click', async () => {
+            const textInput = document.getElementById('text-input').value;
+            const loadingDiv = document.getElementById('loading');
+            const downloadLinkDiv = document.getElementById('download-link');
+            const audioDownload = document.getElementById('audio-download');
+            
+            if (!textInput.trim()) {
+                alert('Please enter some text');
+                return;
+            }
+
+            // Show loading text
+            loadingDiv.style.display = 'block';
+            downloadLinkDiv.style.display = 'none';
+
+            try {
+                // Send POST request to backend
+                const response = await fetch('/generate-audio', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ input_text: textInput })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const result = await response.json();
+                const audioUrl = result.audioUrl;
+
+                console.log('Audio URL:', audioUrl); // Debugging line
+
+                // Update download link and show it
+                audioDownload.href = audioUrl;
+                downloadLinkDiv.style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while generating the audio.');
+            } finally {
+                // Hide loading text
+                loadingDiv.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
